@@ -23,6 +23,8 @@ public class App extends Application {
                     "mainChannel",
                     NotificationManager.IMPORTANCE_LOW
             ));
+
+            System.out.println("this is very un-useful");
         }
     }
 }
