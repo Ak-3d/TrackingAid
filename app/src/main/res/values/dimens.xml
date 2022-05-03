@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="general_bottom_margin">16dp</dimen>
+    <dimen name="image_button_margin">40dp</dimen>
+    <dimen name="image_height">200dp</dimen>
+    <dimen name="bottom_general">16dp</dimen>
+    <dimen name="bounds_size">40</dimen>
+    <dimen name="seek_text_right">40dp</dimen>
+</resources>

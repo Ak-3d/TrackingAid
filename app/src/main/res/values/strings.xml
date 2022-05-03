@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TrackingAid</string>
+    <string name="start_capturing">Start Capturing</string>
+</resources>
