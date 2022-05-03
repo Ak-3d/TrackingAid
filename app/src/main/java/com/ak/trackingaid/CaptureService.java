@@ -42,11 +42,6 @@ public class CaptureService extends Service {
 
     private Thread capturing;
 
-
-    private Mat hcvImg;
-    private Mat threasholdImg;
-    private Mat rgbImg;
-
     private int width;
     private int height;
     private int dpi;
@@ -155,13 +150,13 @@ public class CaptureService extends Service {
 
     public void imageProcessing(Bitmap bitmap) {
         if (bitmap != null) { //change this to local Variable
-            rgbImg = new Mat();
+            Mat rgbImg = new Mat();
             Utils.bitmapToMat(bitmap, rgbImg);
 
-            hcvImg = new Mat();
+            Mat hcvImg = new Mat();
             Imgproc.cvtColor(rgbImg, hcvImg, Imgproc.COLOR_RGB2HSV);
 
-            threasholdImg = new Mat();
+            Mat threasholdImg = new Mat();
             Core.inRange(hcvImg, Variables.lowerBounds, Variables.upperBounds, threasholdImg);
 
             List<MatOfPoint> contours = new ArrayList<>();

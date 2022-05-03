@@ -6,11 +6,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
@@ -19,7 +19,6 @@ import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -62,9 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
+        getMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -79,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
+
+        Toolbar t = findViewById(R.id.toolbar);
+        setSupportActionBar(t);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         Variables.lowerBounds = new Scalar(120, 106, 106);
         Variables.upperBounds = new Scalar(142, 255, 255);
         captureBtn.setOnClickListener((view -> {
