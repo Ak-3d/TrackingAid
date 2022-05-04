@@ -40,7 +40,13 @@
                     android:id="@+id/capture_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/start_capturing"/>
+                    android:text="@string/start_capturing"
+                    android:layout_marginBottom="@dimen/general_bottom_margin"/>
+                <TextView
+                    android:id="@+id/position_main_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/position"/>
                 </LinearLayout>
         </LinearLayout>
     </ScrollView>

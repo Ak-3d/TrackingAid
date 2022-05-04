@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Scalar;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
 
+    private TextView positionTxt;
+
     private CaptureService captureService;
     private Thread viewUpdate;
 
@@ -54,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
         captureBtn = findViewById(R.id.capture_btn);
         imageView = findViewById(R.id.image);
+        positionTxt = findViewById(R.id.position_main_view);
 
-        Variables.isCapturing = false;
         init();
     }
 
@@ -77,13 +80,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init(){
-
         Toolbar t = findViewById(R.id.toolbar);
         setSupportActionBar(t);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         Variables.lowerBounds = new Scalar(120, 106, 106);
         Variables.upperBounds = new Scalar(142, 255, 255);
+
+        Variables.x = 0;
+        Variables.y = 0;
+
+        Variables.isCapturing = false;
+
         captureBtn.setOnClickListener((view -> {
             if(mediaProjection == null){
                 capture_launcher.launch(projectionManager.createScreenCaptureIntent());
@@ -114,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 imageView.setImageBitmap(Variables.image);
+                                positionTxt.setText(getString(R.string.position) + Variables.x + ", " + Variables.y);
                             }
                         });
 

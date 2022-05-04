@@ -168,9 +168,9 @@ public class CaptureService extends Service {
 
                 Canvas c = new Canvas(temp);
                 Paint p = new Paint();
-                p.setStyle(Paint.Style.FILL);
+                p.setStyle(Paint.Style.STROKE);
                 p.setStrokeWidth(5);
-                p.setColor(Color.argb(100, 100, 0, 0));
+                p.setColor(Color.rgb(255, 0, 0));
 
                 Rect r = null;
                 for (MatOfPoint m : contours) {
@@ -183,16 +183,26 @@ public class CaptureService extends Service {
                 Variables.image = temp;
 
                 send(r);
-                Log.d(TAG, "detect: detected");
+              //  Log.d(TAG, "detect: detected");
             }
         }
     }
 
     private void send(Rect r) {
         if(r != null) {
-            r.x -= (width  + r.width ) / 2;
-            r.y -= (height + r.height) / 2;
+            r.x = r.x + (r.width  -  width) / 2; // r.width  / 2 - width / 2;
+            r.y = r.y + (r.height - height) / 2; // r.height / 2 - height / 2;
+            Variables.x = r.x;
+            Variables.y = r.y;
             builder.setContentText("position: " + r.x + ", " + r.y);
+            managerCompat.notify(1, builder.build());
+
+            Log.d(TAG, "send: " + r.x +", " + r.y);
+        }
+        else{
+            Variables.x = 0;
+            Variables.y = 0;
+            builder.setContentText("position: " + 0 + ", " + 0); //don't move, assumes that the detected position is in the middle
             managerCompat.notify(1, builder.build());
         }
     }

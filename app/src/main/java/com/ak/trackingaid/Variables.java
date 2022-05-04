@@ -4,9 +4,11 @@ import android.graphics.Bitmap;
 
 import org.opencv.core.Scalar;
 
-public class Variables {
-    public volatile static Bitmap image;
-    public volatile static boolean isCapturing;
-    public volatile static Scalar lowerBounds;
-    public volatile static Scalar upperBounds;
+public class Variables { ///possible updating is using volatile keyword with the variable
+    public static Bitmap image;
+    public static boolean isCapturing;
+    public static Scalar lowerBounds;
+    public static Scalar upperBounds;
+    public static int x;
+    public static int y;
 }
