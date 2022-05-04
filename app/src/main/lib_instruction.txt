@@ -1,0 +1,5 @@
+You must copy the libraries' folders from OpenCv>sdk>native>libs into /jniLibs/
+
+The essential folders that worked for me are
+ 1. arm64-v8a
+ 2. x86
