@@ -164,17 +164,17 @@ public class CaptureService extends Service {
             List<MatOfPoint> contours = new ArrayList<>();
             Mat her = new Mat();
             Imgproc.findContours(threasholdImg, contours, her, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-            if (contours.size() > 0) {
-                Bitmap temp = Bitmap.createBitmap(rgbImg.cols(), rgbImg.rows(), Bitmap.Config.ARGB_8888);
-                Utils.matToBitmap(rgbImg, temp);
+            Bitmap temp = Bitmap.createBitmap(rgbImg.cols(), rgbImg.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(rgbImg, temp);
 
+            Rect r = null;
+            if (contours.size() > 0) {
                 Canvas c = new Canvas(temp);
                 Paint p = new Paint();
                 p.setStyle(Paint.Style.STROKE);
                 p.setStrokeWidth(5);
                 p.setColor(Color.rgb(255, 0, 0));
 
-                Rect r = null;
                 for (MatOfPoint m : contours) {
                     if (Imgproc.contourArea(m) > 500) {
                         r = Imgproc.boundingRect(m);
@@ -182,11 +182,10 @@ public class CaptureService extends Service {
                         break;
                     }
                 }
-                Variables.image = temp;
-
-                send(r);
-              //  Log.d(TAG, "detect: detected");
             }
+
+            Variables.image = temp;
+            send(r);
         }
     }
 

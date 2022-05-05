@@ -29,6 +29,8 @@ import android.widget.TextView;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Scalar;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
@@ -88,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
     private void init(){
         Toolbar t = findViewById(R.id.toolbar);
         setSupportActionBar(t);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         Variables.lowerBounds = new Scalar(120, 106, 106);
         Variables.upperBounds = new Scalar(142, 255, 255);
