@@ -17,16 +17,20 @@ public class RenderAnimation implements Runnable{
     private Paint p;
     private RectF circle;
 
+    private int thick;
+
     public RenderAnimation(SurfaceHolder surfaceHolder, int width, int height) {
+        thick = 10;
+
         this.surfaceHolder = surfaceHolder;
-        this.width = width;
-        this.height = height;
+        this.width = width - thick;
+        this.height = height - thick;
 
         p = new Paint();
-        p.setStyle(Paint.Style.FILL);
         p.setColor(Color.RED);
+        p.setStrokeWidth(thick);
 
-        circle = new RectF(0,0,100,100);
+        circle = new RectF(thick,thick,100,100);
     }
 
     @Override
@@ -36,7 +40,11 @@ public class RenderAnimation implements Runnable{
             Canvas canvas = surfaceHolder.lockCanvas();
             if(canvas != null) {
                 canvas.drawColor(Color.WHITE);
-
+                p.setStyle(Paint.Style.STROKE);
+                p.setColor(Color.BLACK);
+                canvas.drawRect(thick, thick, width, height, p);
+                p.setStyle(Paint.Style.FILL);
+                p.setColor(Color.RED);
                 canvas.drawOval(circle, p);
 
                 update();
@@ -45,11 +53,11 @@ public class RenderAnimation implements Runnable{
         }
     }
     private void update(){
-        if(circle.right < width - 1 && circle.top < 1)
+        if(circle.right < width - thick && circle.top < thick)
             circle.offset(10, 0);
-        else if(circle.right > width - 1 && circle.bottom < height - 1)
+        else if(circle.right > width - thick && circle.bottom < height - thick)
             circle.offset(0, 10);
-        else if(circle.left > 1 && circle.bottom > height - 1)
+        else if(circle.left > thick && circle.bottom > height - thick)
             circle.offset(-10, 0);
         else
             circle.offset(0, -10);

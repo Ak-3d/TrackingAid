@@ -43,7 +43,6 @@
                 android:layout_marginHorizontal="50dp"
                 android:layout_marginTop="50dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:contentDescription="@string/showing_screenshots" />
@@ -66,7 +65,18 @@
                 android:layout_marginTop="@dimen/general_bottom_margin"
                 app:layout_constraintEnd_toEndOf="@+id/capture_btn"
                 app:layout_constraintStart_toStartOf="@+id/capture_btn"
-                app:layout_constraintTop_toBottomOf="@+id/capture_btn" />
+                app:layout_constraintTop_toBottomOf="@+id/capture_btn"
+                />
+            <View
+                android:visibility="invisible"
+                android:layout_width="10dp"
+                android:layout_height="16dp"
+                android:text="@string/position"
+                android:layout_marginTop="@dimen/general_bottom_margin"
+                app:layout_constraintEnd_toEndOf="@+id/position_main_view"
+                app:layout_constraintStart_toStartOf="@+id/position_main_view"
+                app:layout_constraintTop_toBottomOf="@+id/position_main_view"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </LinearLayout>
