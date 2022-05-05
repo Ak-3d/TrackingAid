@@ -286,8 +286,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         Variables.lowerBounds = lowerBounds;
         Variables.upperBounds = upperBounds;
     }

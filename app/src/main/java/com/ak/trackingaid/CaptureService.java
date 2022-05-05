@@ -79,13 +79,10 @@ public class CaptureService extends Service {
     }
 
     public void startCaptures() {
-        //Need to fix thread starting again
-
-        Variables.isCapturing = true;
         capturing = new Thread() {
             @Override
             public void run() {
-                while (Variables.isCapturing) {
+                while (!Thread.currentThread().isInterrupted()) {
                     try {
                         capture();
                         Thread.sleep(10);
@@ -99,27 +96,28 @@ public class CaptureService extends Service {
     }
 
     public void stopCaptures() {
-        if (virtualDisplay == null || capturing == null) {
-            return;
+        if(capturing != null){
+            capturing.interrupt();
+            capturing = null;
         }
-        Variables.isCapturing = false;
-        try {
-            capturing.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (virtualDisplay != null) {
+            virtualDisplay.release();
+            virtualDisplay = null;
         }
-        virtualDisplay.release();
-        virtualDisplay = null;
-        imageReader.close();
-        imageReader = null;
-        capturing = null;
+        if(imageReader != null){
+            imageReader.close();
+            imageReader = null;
+        }
     }
-
+    public boolean isCapturing(){
+        return capturing != null;
+    }
     public void capture() {
         if (mediaProjection != null) {
             Image image = null;
             Bitmap bitmap = null;
             try {
+
                 image = imageReader.acquireLatestImage();
                 if (image != null) {
                     Image.Plane[] planes = image.getPlanes();

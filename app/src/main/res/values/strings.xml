@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TrackingAid</string>
-    <string name="start_capturing">Start Capturing</string>
+    <string name="start">Start</string>
+    <string name="Stop">Stop</string>
     <string name="position">position:</string>
     <string name="showing_screenshots">Showing Screenshots</string>
 </resources>

@@ -16,7 +16,7 @@
             <ImageView
                 android:id="@+id/img"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/image_height"
+                android:layout_height="@dimen/image_height_setting"
                 android:layout_marginBottom="@dimen/bottom_general"
                 android:src="@mipmap/hue_val_sat"
                 />
@@ -35,7 +35,7 @@
                     <ImageView
                         android:id="@+id/dedicte_colors"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/image_height"
+                        android:layout_height="@dimen/image_height_setting"
                         android:layout_weight="1"/>
                 <View
                     android:id="@+id/upper_color"

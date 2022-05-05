@@ -21,15 +21,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Scalar;
-
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -50,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView positionTxt;
 
     private SurfaceView animation_view;
-    private Thread renderAnimation;
+    private Thread renderAnimationThrd;
 
     private CaptureService captureService;
-    private Thread viewUpdate;
+    private Thread viewUpdateThrd;
 
     private ActivityResultLauncher<Intent> capture_launcher;
     @Override
@@ -71,6 +68,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         if(captureService != null) {
             captureService.stopCaptures();
             captureBtn.setText("start");
-            viewUpdate = null;
+            interruptThreads();
         }
         startActivity(new Intent(this, SettingsActivity.class));
         return true;
@@ -97,58 +100,44 @@ public class MainActivity extends AppCompatActivity {
         Variables.x = 0;
         Variables.y = 0;
 
-        Variables.isCapturing = false;
-
         captureBtn.setOnClickListener((view -> {
             if(mediaProjection == null){
                 capture_launcher.launch(projectionManager.createScreenCaptureIntent());
                 return;
             }
-            if(Variables.isCapturing){
+            if(captureService.isCapturing()){
+                interruptThreads();
                 captureService.stopCaptures();
                 captureBtn.setText("start");
-                viewUpdate = null;
             }else{
                 captureService.prepare();
                 captureService.startCaptures();
                 captureBtn.setText("stop");
-                createViewThread();
-                viewUpdate.start();
+                createViewThreads();
             }
 
         }));
-
-        animation_view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if(renderAnimation == null) {
-                    Log.d(TAG, "onGlobalLayout: + renderAnimation");
-                    renderAnimation = new Thread(new RenderAnimation(animation_view.getHolder(), animation_view.getWidth(), animation_view.getHeight()));
-                    renderAnimation.start();
-                    animation_view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-            }
-        });
         createLaunchers();
     }
-    private void createViewThread(){
-        viewUpdate = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (Variables.isCapturing){
-                    if(Variables.image != null)
-                        imageView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                imageView.setImageBitmap(Variables.image);
-                                positionTxt.setText(getString(R.string.position) + Variables.x + ", " + Variables.y);
-                            }
-                        });
+    private void createViewThreads(){
+        viewUpdateThrd = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()){
+                if(Variables.image != null)
+                    imageView.post(() -> {
+                        imageView.setImageBitmap(Variables.image);
+                        positionTxt.setText(getString(R.string.position) + Variables.x + ", " + Variables.y);
+                    });
 
-                    SystemClock.sleep(10);
-                }
+                Log.d(TAG, "createViewThreads: running");
+                SystemClock.sleep(10);
             }
         });
+        viewUpdateThrd.start();
+
+        renderAnimationThrd = new Thread(new RenderAnimation(animation_view.getHolder(), animation_view.getWidth(), animation_view.getHeight()));
+        renderAnimationThrd.start();
+
+        Log.d(TAG, "createViewThreads: ThreadsCreated");
     }
     private void createLaunchers(){
         capture_launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
@@ -182,5 +171,23 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        interruptThreads();
+    }
 
+    private void interruptThreads(){
+        if(renderAnimationThrd != null) {
+            renderAnimationThrd.interrupt();
+            renderAnimationThrd = null;
+        }
+        if(viewUpdateThrd != null) {
+            viewUpdateThrd.interrupt();
+            viewUpdateThrd = null;
+           Log.d(TAG, "onPause: threads are interrupted");
+        }
+
+        //I excluded stopCapturing because this function is used in onPause
+    }
 }
