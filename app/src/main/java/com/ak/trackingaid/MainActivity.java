@@ -20,6 +20,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceView;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView positionTxt;
 
+    private SurfaceView animation_view;
+    private Thread renderAnimation;
+
     private CaptureService captureService;
     private Thread viewUpdate;
 
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         captureBtn = findViewById(R.id.capture_btn);
         imageView = findViewById(R.id.image);
         positionTxt = findViewById(R.id.position_main_view);
+        animation_view = findViewById(R.id.animation_view);
 
         init();
     }
@@ -110,6 +116,18 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }));
+
+        animation_view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if(renderAnimation == null) {
+                    Log.d(TAG, "onGlobalLayout: + renderAnimation");
+                    renderAnimation = new Thread(new RenderAnimation(animation_view.getHolder(), animation_view.getWidth(), animation_view.getHeight()));
+                    renderAnimation.start();
+                    animation_view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            }
+        });
         createLaunchers();
     }
     private void createViewThread(){
@@ -162,4 +180,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+
 }

@@ -79,6 +79,8 @@ public class CaptureService extends Service {
     }
 
     public void startCaptures() {
+        //Need to fix thread starting again
+
         Variables.isCapturing = true;
         capturing = new Thread() {
             @Override
