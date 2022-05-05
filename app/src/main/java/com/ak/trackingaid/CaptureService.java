@@ -15,6 +15,7 @@ import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -83,22 +84,21 @@ public class CaptureService extends Service {
             @Override
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
-                    try {
-                        capture();
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    capture();
+                    SystemClock.sleep(10);
+                    Log.d(TAG, "run: capturing, interrupt:" + Thread.currentThread().isInterrupted());
                 }
             }
         };
         capturing.start();
+        Log.d(TAG, "startCaptures");
     }
 
     public void stopCaptures() {
         if(capturing != null){
             capturing.interrupt();
             capturing = null;
+            Log.d(TAG, "stopCaptures");
         }
         if (virtualDisplay != null) {
             virtualDisplay.release();
