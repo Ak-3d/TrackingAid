@@ -1,7 +1,5 @@
 package com.ak.trackingaid;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -47,12 +45,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView positionTxt;
 
     private SurfaceView animation_view;
+    private RenderAnimation renderAnimation;
     private Thread renderAnimationThrd;
 
     private CaptureService captureService;
     private Thread viewUpdateThrd;
 
     private ActivityResultLauncher<Intent> capture_launcher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         positionTxt = findViewById(R.id.position_main_view);
         animation_view = findViewById(R.id.animation_view);
 
+        renderAnimation = new RenderAnimation(animation_view.getHolder());
+        animation_view.setOnTouchListener(renderAnimation);
         init();
     }
 
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(captureService != null) {
             captureService.stopCaptures();
-            captureBtn.setText("start");
+            captureBtn.setText(getString(R.string.start));
             interruptThreads();
         }
         startActivity(new Intent(this, SettingsActivity.class));
@@ -107,11 +109,11 @@ public class MainActivity extends AppCompatActivity {
             if(captureService.isCapturing()){
                 interruptThreads();
                 captureService.stopCaptures();
-                captureBtn.setText("start");
+                captureBtn.setText(getString(R.string.start));
             }else{
                 captureService.prepare();
                 captureService.startCaptures();
-                captureBtn.setText("stop");
+                captureBtn.setText(getString(R.string.Stop));
                 createViewThreads();
             }
 
@@ -124,7 +126,8 @@ public class MainActivity extends AppCompatActivity {
                 if(Variables.image != null)
                     imageView.post(() -> {
                         imageView.setImageBitmap(Variables.image);
-                        positionTxt.setText(getString(R.string.position) + Variables.x + ", " + Variables.y);
+                        String posStr = getString(R.string.position) + Variables.x + ", " + Variables.y;
+                        positionTxt.setText(posStr);
                     });
 
                 Log.d(TAG, "createViewThreads: running");
@@ -133,25 +136,23 @@ public class MainActivity extends AppCompatActivity {
         });
         viewUpdateThrd.start();
 
-        renderAnimationThrd = new Thread(new RenderAnimation(animation_view.getHolder(), animation_view.getWidth(), animation_view.getHeight()));
+        renderAnimationThrd = new Thread(renderAnimation);
         renderAnimationThrd.start();
 
         Log.d(TAG, "createViewThreads: ThreadsCreated");
     }
     private void createLaunchers(){
-        capture_launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-            @Override
-            public void onActivityResult(ActivityResult result) {
-                mediaProjection = projectionManager.getMediaProjection(result.getResultCode(), result.getData());
-                if(mediaProjection != null) {
-                    Intent i = new Intent(MainActivity.this, CaptureService.class);
-                    bindService(i, connection, BIND_AUTO_CREATE);
+        capture_launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    mediaProjection = projectionManager.getMediaProjection(result.getResultCode(), result.getData());
+                    if(mediaProjection != null) {
+                        Intent i = new Intent(MainActivity.this, CaptureService.class);
+                        bindService(i, connection, BIND_AUTO_CREATE);
                 }
-            }
         });
         capture_launcher.launch(projectionManager.createScreenCaptureIntent());
     }
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             CaptureService.CaptureBinder binder =(CaptureService.CaptureBinder) iBinder;
