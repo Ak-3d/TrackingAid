@@ -4,8 +4,7 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
-
-import androidx.annotation.RequiresApi;
+import android.util.Log;
 
 public class App extends Application {
 
@@ -25,6 +24,9 @@ public class App extends Application {
             ));
 
             System.out.println("this is very un-useful");
+
+            //TODO is logging takes time
+            Log.d(TAG, "onCreate: channeles are created");
         }
     }
 }

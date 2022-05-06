@@ -1,5 +1,6 @@
 package com.ak.trackingaid;
 
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -88,19 +89,16 @@ public class RenderAnimation implements Runnable, SurfaceHolder.Callback, View.O
         Log.d(TAG, "surfaceDestroyed: ");
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         SystemClock.sleep(10);
         switch (motionEvent.getAction()){
             case MotionEvent.ACTION_DOWN:
-                circle.offsetTo(motionEvent.getX() - rad, motionEvent.getY() - rad);
-                break;
             case MotionEvent.ACTION_MOVE:
-                circle.offsetTo(motionEvent.getX() - rad, motionEvent.getY() - rad);
-                break;
             case MotionEvent.ACTION_UP:
                 circle.offsetTo(motionEvent.getX() - rad, motionEvent.getY() - rad);
-                break;
+
         }
         return true;
     }

@@ -1,6 +1,5 @@
 package com.ak.trackingaid;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -56,12 +54,9 @@ public class SettingsActivity extends AppCompatActivity {
 
     private Scalar lowerBounds;
     private Scalar upperBounds;
-    private int widthColor = 180 / 8;
 
     private Mat hcvImg;
     private Mat hcvDefault;
-    private Mat threasholdImg;
-    private Mat threasholdDefault;
     private Mat rgbImg;
     private Mat rgbDefault;
 
@@ -105,8 +100,8 @@ public class SettingsActivity extends AppCompatActivity {
         upperColor.setBackgroundColor(Color.HSVToColor(new float[]{2 * hupperBar.getProgress(), 1, 1}));/* 360 colors devided by 180 possibles*/
         lowerColor.setBackgroundColor(Color.HSVToColor(new float[]{2 * hlowerBar.getProgress(), 1, 1}));
 
-        threasholdImg = new Mat();
-        threasholdDefault = new Mat();
+        Mat threasholdImg = new Mat();
+        Mat threasholdDefault = new Mat();
         Core.inRange(hcvImg, lowerBounds, upperBounds, threasholdImg);
         Core.inRange(hcvDefault, lowerBounds, upperBounds, threasholdDefault);
 
@@ -174,7 +169,8 @@ public class SettingsActivity extends AppCompatActivity {
         hlowerBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                hlowerText.setText(i + "");
+                String iStr = i + "";
+                hlowerText.setText(iStr);
                 lowerBounds = new Scalar(i, satBar.getProgress(), valBar.getProgress());
                 if(loadedBtmp != null)
                     detect();
@@ -194,7 +190,8 @@ public class SettingsActivity extends AppCompatActivity {
         hupperBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                hupperText.setText(i + "");
+                String iStr = i + "";
+                hupperText.setText(iStr);
                 upperBounds = new Scalar(i, 255, 255);
                 if(loadedBtmp != null)
                     detect();
@@ -214,7 +211,8 @@ public class SettingsActivity extends AppCompatActivity {
         satBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                satText.setText(i + "");
+                String iStr = i + "";
+                satText.setText(iStr);
                 lowerBounds = new Scalar(hlowerBar.getProgress(), i, valBar.getProgress());
                 if(loadedBtmp != null)
                     detect();
@@ -233,7 +231,8 @@ public class SettingsActivity extends AppCompatActivity {
         valBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                valText.setText(i + "");
+                String iStr = i + "";
+                valText.setText(iStr);
                 lowerBounds = new Scalar(hlowerBar.getProgress(), satBar.getProgress(), i);
 
                 if(loadedBtmp != null)
@@ -257,31 +256,28 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initLoadingResult(){
-        loadingResultLanucher = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
-            @Override
-            public void onActivityResult(Uri result) {
-                if(result == null)return;
+        loadingResultLanucher = registerForActivityResult(new ActivityResultContracts.GetContent(), result -> {
+            if(result == null)return;
 
-                ContentResolver cr = getContentResolver();
-                InputStream in = null;
-                try {
-                    in = cr.openInputStream(result);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-                loadedBtmp = BitmapFactory.decodeStream(in);
-                img.setImageBitmap(loadedBtmp);
-
-                rgbImg = new Mat();
-                Utils.bitmapToMat(loadedBtmp, rgbImg);
-
-                hcvImg = new Mat();
-                Imgproc.cvtColor(rgbImg, hcvImg, Imgproc.COLOR_RGB2HSV);
-
-                Log.d(TAG, "loading complete address of Mat:" + rgbImg);
-                detect();
+            ContentResolver cr = getContentResolver();
+            InputStream in = null;
+            try {
+                in = cr.openInputStream(result);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
+
+            loadedBtmp = BitmapFactory.decodeStream(in);
+            img.setImageBitmap(loadedBtmp);
+
+            rgbImg = new Mat();
+            Utils.bitmapToMat(loadedBtmp, rgbImg);
+
+            hcvImg = new Mat();
+            Imgproc.cvtColor(rgbImg, hcvImg, Imgproc.COLOR_RGB2HSV);
+
+            Log.d(TAG, "loading complete address of Mat:" + rgbImg);
+            detect();
         });
     }
 

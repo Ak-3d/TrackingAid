@@ -5,14 +5,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ImageFormat;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -74,7 +73,7 @@ public class CaptureService extends Service {
     }
 
     public void prepare() {
-        imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2);
+        imageReader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 2);
         virtualDisplay = mediaProjection.createVirtualDisplay("screenshot", width, height, dpi,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
     }
@@ -114,36 +113,25 @@ public class CaptureService extends Service {
     }
     public void capture() {
         if (mediaProjection != null) {
-            Image image = null;
             Bitmap bitmap = null;
-            try {
 
-                image = imageReader.acquireLatestImage();
+            try (Image image = imageReader.acquireLatestImage()) {
                 if (image != null) {
                     Image.Plane[] planes = image.getPlanes();
                     Buffer imageBuffer = planes[0].getBuffer().rewind();
 
-                    int width = image.getWidth();
-                    int height = image.getHeight();
-
-                    int pixelStride = planes[0].getPixelStride();
-                    int rowStride = planes[0].getRowStride();
-                    int rowPadding = rowStride - pixelStride * width;
-
-                    bitmap = Bitmap.createBitmap(width + rowPadding / pixelStride, height,
+                    bitmap = Bitmap.createBitmap(width, height,
                             Bitmap.Config.ARGB_8888);
                     bitmap.copyPixelsFromBuffer(imageBuffer);
 
                     imageProcessing(bitmap);
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 e.printStackTrace();
             } finally {
                 if (bitmap != null)
                     bitmap.recycle();
 
-                if (image != null)
-                    image.close();
             }
         }
     }
