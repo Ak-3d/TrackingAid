@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -13,14 +14,12 @@ import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.opencv.android.OpenCVLoader;
@@ -40,19 +39,14 @@ public class MainActivity extends AppCompatActivity {
     private MediaProjection mediaProjection;
     private Button captureBtn;
 
-    private ImageView imageView;
-
-    private TextView positionTxt;
-
-    private SurfaceView animation_view;
     private RenderAnimation renderAnimation;
     private Thread renderAnimationThrd;
 
     private CaptureService captureService;
-    private Thread viewUpdateThrd;
 
     private ActivityResultLauncher<Intent> capture_launcher;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,11 +54,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         captureBtn = findViewById(R.id.capture_btn);
-        imageView = findViewById(R.id.image);
-        positionTxt = findViewById(R.id.position_main_view);
-        animation_view = findViewById(R.id.animation_view);
+        TextView positionTxt = findViewById(R.id.position_main_view);
+        SurfaceView animation_view = findViewById(R.id.animation_view);
 
-        renderAnimation = new RenderAnimation(animation_view.getHolder());
+        renderAnimation = new RenderAnimation(this, animation_view.getHolder(), positionTxt);
         animation_view.setOnTouchListener(renderAnimation);
         init();
     }
@@ -121,21 +114,6 @@ public class MainActivity extends AppCompatActivity {
         createLaunchers();
     }
     private void createViewThreads(){
-        viewUpdateThrd = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()){
-                if(Variables.image != null)
-                    imageView.post(() -> {
-                        imageView.setImageBitmap(Variables.image);
-                        String posStr = getString(R.string.position) + Variables.x + ", " + Variables.y;
-                        positionTxt.setText(posStr);
-                    });
-
-                Log.d(TAG, "createViewThreads: running");
-                SystemClock.sleep(10);
-            }
-        });
-        viewUpdateThrd.start();
-
         renderAnimationThrd = new Thread(renderAnimation);
         renderAnimationThrd.start();
 
@@ -182,11 +160,7 @@ public class MainActivity extends AppCompatActivity {
             renderAnimationThrd.interrupt();
             renderAnimationThrd = null;
         }
-        if(viewUpdateThrd != null) {
-            viewUpdateThrd.interrupt();
-            viewUpdateThrd = null;
-           Log.d(TAG, "onPause: threads are interrupted");
-        }
+       Log.d(TAG, "onPause: threads are interrupted");
 
         //I excluded stopCapturing because this function is used in onPause
     }

@@ -1,12 +1,10 @@
 package com.ak.trackingaid;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ImageFormat;
-import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.Image;
@@ -72,8 +70,9 @@ public class CaptureService extends Service {
         this.dpi = dpi;
     }
 
+    @SuppressLint("WrongConstant")//TODO search for better constant, ImageFormat.JPEG was not stable
     public void prepare() {
-        imageReader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 2);
+        imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2);
         virtualDisplay = mediaProjection.createVirtualDisplay("screenshot", width, height, dpi,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
     }
@@ -144,33 +143,22 @@ public class CaptureService extends Service {
             Mat hcvImg = new Mat();
             Imgproc.cvtColor(rgbImg, hcvImg, Imgproc.COLOR_RGB2HSV);
 
-            Mat threasholdImg = new Mat();
-            Core.inRange(hcvImg, Variables.lowerBounds, Variables.upperBounds, threasholdImg);
+            Mat thresholdImg = new Mat();
+            Core.inRange(hcvImg, Variables.lowerBounds, Variables.upperBounds, thresholdImg);
 
             List<MatOfPoint> contours = new ArrayList<>();
             Mat her = new Mat();
-            Imgproc.findContours(threasholdImg, contours, her, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-            Bitmap temp = Bitmap.createBitmap(rgbImg.cols(), rgbImg.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(rgbImg, temp);
+            Imgproc.findContours(thresholdImg, contours, her, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
             Rect r = null;
             if (contours.size() > 0) {
-                Canvas c = new Canvas(temp);
-                Paint p = new Paint();
-                p.setStyle(Paint.Style.STROKE);
-                p.setStrokeWidth(5);
-                p.setColor(Color.rgb(255, 0, 0));
-
                 for (MatOfPoint m : contours) {
                     if (Imgproc.contourArea(m) > 500) {
                         r = Imgproc.boundingRect(m);
-                        c.drawRect(r.x, r.y, r.x + r.width, r.y + r.height, p);
                         break;
                     }
                 }
             }
-
-            Variables.image = temp;
             send(r);
         }
     }

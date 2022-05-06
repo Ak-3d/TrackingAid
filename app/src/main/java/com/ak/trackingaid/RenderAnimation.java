@@ -1,6 +1,7 @@
 package com.ak.trackingaid;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -17,6 +19,9 @@ public class RenderAnimation implements Runnable, SurfaceHolder.Callback, View.O
     private static final String TAG = "RenderAnimation";
 
     private final SurfaceHolder surfaceHolder;
+    private final TextView posTxtv;
+    private final Context c;
+
     private int width;
     private int height;
 
@@ -26,11 +31,13 @@ public class RenderAnimation implements Runnable, SurfaceHolder.Callback, View.O
     private final int speed;
     private final int rad;
 
-    public RenderAnimation(SurfaceHolder surfaceHolder) {
+    public RenderAnimation(Context c, SurfaceHolder surfaceHolder, TextView posTxtv) {
         speed = 2;
         rad = 40;
 
         this.surfaceHolder = surfaceHolder;
+        this.posTxtv = posTxtv;
+        this.c = c;
 
         p = new Paint();
         p.setStyle(Paint.Style.FILL);
@@ -46,6 +53,8 @@ public class RenderAnimation implements Runnable, SurfaceHolder.Callback, View.O
         while(!Thread.currentThread().isInterrupted()){
             Canvas canvas = surfaceHolder.lockCanvas();
             if(canvas != null) {
+                updateView();
+
                 canvas.drawColor(Color.WHITE);
 
                 canvas.drawOval(circle, p);
@@ -54,6 +63,12 @@ public class RenderAnimation implements Runnable, SurfaceHolder.Callback, View.O
                 surfaceHolder.unlockCanvasAndPost(canvas);
             }
         }
+    }
+    private void updateView(){
+        posTxtv.post(() ->{
+            String posStr = c.getString(R.string.position) + Variables.x + ", " + Variables.y;
+            posTxtv.setText(posStr);
+        });
     }
     private void update(){
         if(circle.right < width - rad && circle.top <= rad) //going right
