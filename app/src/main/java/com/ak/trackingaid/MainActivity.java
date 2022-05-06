@@ -18,7 +18,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,12 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private Button captureBtn;
 
     private ImageView imageView;
-
     private TextView positionTxt;
-
-    private SurfaceView animation_view;
-    private RenderAnimation renderAnimation;
-    private Thread renderAnimationThrd;
 
     private CaptureService captureService;
     private Thread viewUpdateThrd;
@@ -62,10 +56,6 @@ public class MainActivity extends AppCompatActivity {
         captureBtn = findViewById(R.id.capture_btn);
         imageView = findViewById(R.id.image);
         positionTxt = findViewById(R.id.position_main_view);
-        animation_view = findViewById(R.id.animation_view);
-
-        renderAnimation = new RenderAnimation(animation_view.getHolder());
-        animation_view.setOnTouchListener(renderAnimation);
         init();
     }
 
@@ -136,9 +126,6 @@ public class MainActivity extends AppCompatActivity {
         });
         viewUpdateThrd.start();
 
-        renderAnimationThrd = new Thread(renderAnimation);
-        renderAnimationThrd.start();
-
         Log.d(TAG, "createViewThreads: ThreadsCreated");
     }
     private void createLaunchers(){
@@ -178,15 +165,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void interruptThreads(){
-        if(renderAnimationThrd != null) {
-            renderAnimationThrd.interrupt();
-            renderAnimationThrd = null;
-        }
         if(viewUpdateThrd != null) {
             viewUpdateThrd.interrupt();
             viewUpdateThrd = null;
-           Log.d(TAG, "onPause: threads are interrupted");
         }
+           Log.d(TAG, "onPause: threads are interrupted");
 
         //I excluded stopCapturing because this function is used in onPause
     }

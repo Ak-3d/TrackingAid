@@ -56,7 +56,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private Scalar lowerBounds;
     private Scalar upperBounds;
-    private int widthColor = 180 / 8;
 
     private Mat hcvImg;
     private Mat hcvDefault;
