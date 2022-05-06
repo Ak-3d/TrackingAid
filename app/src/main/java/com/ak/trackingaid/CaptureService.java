@@ -153,7 +153,7 @@ public class CaptureService extends Service {
             Rect r = null;
             if (contours.size() > 0) {
                 for (MatOfPoint m : contours) {
-                    if (Imgproc.contourArea(m) > 500) {
+                    if (Imgproc.contourArea(m) > 200){
                         r = Imgproc.boundingRect(m);
                         break;
                     }

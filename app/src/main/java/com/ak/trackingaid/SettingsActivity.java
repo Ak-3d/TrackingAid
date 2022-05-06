@@ -32,6 +32,8 @@ import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    //TODO change the way of selecting color range
+
     private static final String TAG = "SettingsActivity";
 
     private ImageView img;
@@ -49,7 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
     private SeekBar satBar;
     private SeekBar valBar;
 
-    private EditText satText;
+    private EditText satText; //TODO change these fuckers to TextView
     private EditText valText;
 
     private Scalar lowerBounds;

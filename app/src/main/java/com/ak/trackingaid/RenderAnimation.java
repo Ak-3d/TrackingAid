@@ -16,6 +16,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 public class RenderAnimation implements Runnable, SurfaceHolder.Callback, View.OnTouchListener {
+
+    //TODO make sure you add a bunch of other circles
+
     private static final String TAG = "RenderAnimation";
 
     private final SurfaceHolder surfaceHolder;
