@@ -36,7 +36,7 @@ public class RenderAnimation implements Runnable, SurfaceHolder.Callback, View.O
 
     public RenderAnimation(Context c, SurfaceHolder surfaceHolder, TextView posTxtv) {
         speed = 2;
-        rad = 40;
+        rad = 20;
 
         this.surfaceHolder = surfaceHolder;
         this.posTxtv = posTxtv;

@@ -119,7 +119,14 @@ public class CaptureService extends Service {
                     Image.Plane[] planes = image.getPlanes();
                     Buffer imageBuffer = planes[0].getBuffer().rewind();
 
-                    bitmap = Bitmap.createBitmap(width, height,
+                    int width = image.getWidth();
+                    int height = image.getHeight();
+
+                    int pixelStride = planes[0].getPixelStride();
+                    int rowStride = planes[0].getRowStride();
+                    int rowPadding = rowStride - pixelStride * width;
+
+                    bitmap = Bitmap.createBitmap(width + rowPadding / pixelStride, height,
                             Bitmap.Config.ARGB_8888);
                     bitmap.copyPixelsFromBuffer(imageBuffer);
 
